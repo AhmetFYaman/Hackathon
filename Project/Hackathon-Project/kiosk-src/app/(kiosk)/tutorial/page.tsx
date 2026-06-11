@@ -2,6 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import KioskShell from "@/components/KioskShell";
+import PainFace from "@/components/PainFace";
 
 const STEPS = [
   {
@@ -56,7 +57,14 @@ function TapVisual() {
 }
 
 function RateVisual() {
-  const faces = ["ðŸ˜Š", "ðŸ™‚", "ðŸ˜", "ðŸ˜•", "ðŸ˜£", "ðŸ˜­"];
+  const faces: { level: 0 | 2 | 4 | 6 | 8 | 10; color: string }[] = [
+    { level: 0, color: "#22c55e" },
+    { level: 2, color: "#86efac" },
+    { level: 4, color: "#facc15" },
+    { level: 6, color: "#fb923c" },
+    { level: 8, color: "#ef4444" },
+    { level: 10, color: "#b91c1c" },
+  ];
   const [active, setActive] = useState(2);
   return (
     <div className="flex flex-col items-center gap-4">
@@ -65,9 +73,9 @@ function RateVisual() {
           <button
             key={i}
             onClick={() => setActive(i)}
-            className={`text-3xl transition-all ${i === active ? "scale-150" : "opacity-40 scale-100"}`}
+            className={`transition-all ${i === active ? "scale-150" : "opacity-40 scale-100"}`}
           >
-            {f}
+            <PainFace level={f.level} color={f.color} className="w-9 h-9" />
           </button>
         ))}
       </div>
@@ -82,13 +90,13 @@ function RemoveVisual() {
     <div className="flex flex-col items-center gap-4">
       <button
         onClick={() => setOn((v) => !v)}
-        className={`w-16 h-16 rounded-full border-2 transition-all duration-300 text-2xl ${
+        className={`w-16 h-16 rounded-full border-2 transition-all duration-300 flex items-center justify-center ${
           on
             ? "bg-rose-500/40 border-rose-400 scale-110"
             : "bg-white/5 border-white/20 scale-100 opacity-50"
         }`}
       >
-        {on ? "ðŸ”´" : "â¬œ"}
+        <span className={`w-6 h-6 rounded-full transition-all ${on ? "bg-rose-400" : "bg-white/20"}`} />
       </button>
       <p className="text-sky-400 text-sm">Tap to toggle</p>
     </div>
@@ -139,7 +147,7 @@ export default function TutorialPage() {
           onClick={next}
           className="px-12 py-5 rounded-2xl bg-sky-500 hover:bg-sky-400 active:scale-95 transition-all text-white font-bold text-xl"
         >
-          {step < STEPS.length - 1 ? "Next â†’" : "Got it â€” Start â†’"}
+          {step < STEPS.length - 1 ? "Next" : "Got it - Start"}
         </button>
 
         <button

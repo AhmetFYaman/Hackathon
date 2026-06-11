@@ -48,3 +48,6 @@ Thumbs.db
 # ── Logs ───────────────────────────────────────────────────────────────────────
 *.log
 npm-debug.log*
+
+# Nested clone of the new v1.1 repo - not part of this repo
+Hackathon-v1.1/

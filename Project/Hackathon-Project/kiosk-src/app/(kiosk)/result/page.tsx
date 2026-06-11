@@ -39,7 +39,7 @@ export default function ResultPage() {
   return (
     <KioskShell step={7}>
       <div className="flex flex-col items-center gap-5 px-5 py-6 min-h-full justify-center">
-        {/* ESI badge â€” compact for portrait */}
+        {/* ESI badge - compact for portrait */}
         <div
           className="w-28 h-28 rounded-3xl flex flex-col items-center justify-center border-2 shrink-0"
           style={{

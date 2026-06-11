@@ -1,16 +1,17 @@
-﻿"use client";
+"use client";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import KioskShell from "@/components/KioskShell";
+import PainFace from "@/components/PainFace";
 import { useKioskStore } from "@/store/kioskStore";
 
-const FACES = [
-  { emoji: "ðŸ˜Š", label: "No Pain",      value: 0,  color: "#22c55e" },
-  { emoji: "ðŸ™‚", label: "Very Mild",    value: 2,  color: "#86efac" },
-  { emoji: "ðŸ˜", label: "Mild",         value: 4,  color: "#facc15" },
-  { emoji: "ðŸ˜•", label: "Moderate",     value: 6,  color: "#fb923c" },
-  { emoji: "ðŸ˜£", label: "Severe",       value: 8,  color: "#ef4444" },
-  { emoji: "ðŸ˜­", label: "Worst",        value: 10, color: "#7f1d1d" },
+const FACES: { label: string; value: 0 | 2 | 4 | 6 | 8 | 10; color: string }[] = [
+  { label: "No Pain",   value: 0,  color: "#22c55e" },
+  { label: "Very Mild", value: 2,  color: "#86efac" },
+  { label: "Mild",      value: 4,  color: "#facc15" },
+  { label: "Moderate",  value: 6,  color: "#fb923c" },
+  { label: "Severe",    value: 8,  color: "#ef4444" },
+  { label: "Worst",     value: 10, color: "#b91c1c" },
 ];
 
 export default function PainScalePage() {
@@ -57,13 +58,17 @@ export default function PainScalePage() {
 
         {/* Big selected face */}
         <div
-          className="w-28 h-28 rounded-full flex items-center justify-center text-6xl transition-all duration-300"
+          className="w-28 h-28 rounded-full flex items-center justify-center transition-all duration-300"
           style={{
             background: face ? `${face.color}22` : "rgba(255,255,255,0.04)",
             border: `2px solid ${face ? face.color : "rgba(255,255,255,0.1)"}`,
           }}
         >
-          {face ? face.emoji : "â“"}
+          {face ? (
+            <PainFace level={face.value} color={face.color} className="w-20 h-20" />
+          ) : (
+            <span className="text-4xl font-bold text-slate-600">?</span>
+          )}
         </div>
 
         {/* Face scale row */}
@@ -83,7 +88,7 @@ export default function PainScalePage() {
                   : {}
               }
             >
-              <span className="text-4xl leading-none">{f.emoji}</span>
+              <PainFace level={f.value} color={f.color} className="w-10 h-10" />
               <span className="text-xs text-slate-400">{f.label}</span>
               <span className="text-xs font-bold" style={{ color: f.color }}>{f.value}</span>
             </button>
@@ -130,7 +135,7 @@ export default function PainScalePage() {
           disabled={selected === null}
           className="px-14 py-5 rounded-2xl bg-sky-500 hover:bg-sky-400 active:scale-95 transition-all text-white font-bold text-xl disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          {currentIdx < regions.length - 1 ? "Next Area â†’" : "Submit â†’"}
+          {currentIdx < regions.length - 1 ? "Next Area" : "Submit"}
         </button>
       </div>
     </KioskShell>

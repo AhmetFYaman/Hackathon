@@ -18,7 +18,9 @@ export default function BodyMapPage() {
           <h1 className="text-xl font-bold text-white">Where does it hurt?</h1>
           <div className="flex items-center gap-3 mt-1.5">
             <div className="flex items-center gap-1.5 bg-sky-500/10 border border-sky-500/20 rounded-lg px-3 py-1.5">
-              <span className="text-base">ðŸ‘†</span>
+              <svg className="w-4 h-4 text-sky-300 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.042 21.672 13.684 16.6m0 0-2.51 2.225.569-9.47 5.227 7.917-3.286-.672ZM12 2.25V4.5m5.834.166-1.591 1.591M20.25 10.5H18M7.757 14.743l-1.59 1.59M6 10.5H3.75m4.007-4.243-1.59-1.59" />
+              </svg>
               <span className="text-xs text-sky-300">Tap the body to select pain areas</span>
             </div>
             {/* Selected region chips */}
@@ -35,7 +37,7 @@ export default function BodyMapPage() {
                       style={{ backgroundColor: getPainColor(r.painLevel) }}
                     />
                     <span className="text-white">{r.label}</span>
-                    <span className="text-slate-500 ml-0.5">âœ•</span>
+                    <span className="text-slate-500 ml-0.5 font-bold">x</span>
                   </button>
                 ))}
               </div>
@@ -43,25 +45,25 @@ export default function BodyMapPage() {
           </div>
         </div>
 
-        {/* Body map â€” takes all available middle space */}
+        {/* Body map - takes all available middle space */}
         <div className="flex-1 min-h-0 flex items-center justify-center">
           <BodyMap />
         </div>
 
-        {/* Action buttons â€” always visible at bottom */}
+        {/* Action buttons - always visible at bottom */}
         <div className="flex flex-col gap-2 shrink-0 pb-1">
           <button
             onClick={() => router.push("/painscale")}
             disabled={selectedRegions.length === 0}
             className="w-full py-4 rounded-2xl bg-sky-500 hover:bg-sky-400 active:scale-95 transition-all text-white font-bold text-lg disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {selectedRegions.length === 0 ? "Tap the body to select an area" : `Rate Pain (${selectedRegions.length} area${selectedRegions.length > 1 ? "s" : ""}) â†’`}
+            {selectedRegions.length === 0 ? "Tap the body to select an area" : `Rate Pain (${selectedRegions.length} area${selectedRegions.length > 1 ? "s" : ""})`}
           </button>
           <button
             onClick={() => router.push("/painscale")}
             className="text-slate-500 text-sm text-center py-1"
           >
-            I have no pain â€” skip
+            I have no pain - skip
           </button>
         </div>
       </div>
