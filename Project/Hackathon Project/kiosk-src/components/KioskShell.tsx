@@ -5,13 +5,13 @@ import { t, LANGUAGES } from "@/lib/i18n";
 
 type Props = {
   children: React.ReactNode;
-  step?: number;    // 1-8 for progress bar
+  step?: number;    // 1-7 for progress bar
   totalSteps?: number;
 };
 
-const STEP_LABELS = ["Consent", "Camera", "Intake", "Vitals", "Tutorial", "Body Map", "Pain", "Done"];
+const STEP_LABELS = ["Consent", "Intake", "Vitals", "Tutorial", "Body Map", "Pain", "Done"];
 
-export default function KioskShell({ children, step, totalSteps = 8 }: Props) {
+export default function KioskShell({ children, step, totalSteps = 7 }: Props) {
   const language = useKioskStore((s) => s.language);
   const dir = LANGUAGES[language].dir;
 

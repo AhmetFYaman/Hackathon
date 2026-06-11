@@ -251,15 +251,16 @@ def record_clip(duration: float, tmp_path: str) -> int:
 
     cam = Picamera2()
     try:
+        # 720p so the BP monitor digits are large enough for OCR on the Jetson
         cam.configure(cam.create_video_configuration(
-            main={"size": (640, 480), "format": "RGB888"}
+            main={"size": (1280, 720), "format": "RGB888"}
         ))
         cam.start()
         time.sleep(0.3)   # sensor warm-up / auto-exposure settle
 
         fps = 15
         out = cv2.VideoWriter(
-            tmp_path, cv2.VideoWriter_fourcc(*"mp4v"), fps, (640, 480)
+            tmp_path, cv2.VideoWriter_fourcc(*"mp4v"), fps, (1280, 720)
         )
         frames = int(duration * fps)
         for _ in range(frames):

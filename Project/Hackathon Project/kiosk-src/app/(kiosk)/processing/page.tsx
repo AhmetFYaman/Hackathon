@@ -8,7 +8,7 @@ import { t } from "@/lib/i18n";
 
 export default function ProcessingPage() {
   const router = useRouter();
-  const { vitals, selectedRegions, intake, sessionId, language, setResult, setJetsonResult } = useKioskStore();
+  const { vitals, selectedRegions, intake, sessionId, firstName, lastName, language, setResult, setJetsonResult } = useKioskStore();
   const [stepIdx, setStepIdx] = useState(0);
   const [done, setDone] = useState(false);
   const [statusNote, setStatusNote] = useState<string | null>(null);
@@ -86,6 +86,8 @@ export default function ProcessingPage() {
         vitals,
         intake,
         regions: selectedRegions,
+        firstName,
+        lastName,
         timestamp: new Date().toISOString(),
       };
 

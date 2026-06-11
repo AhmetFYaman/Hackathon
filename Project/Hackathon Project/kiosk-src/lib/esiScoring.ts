@@ -29,10 +29,11 @@ function vitalRisk(vitals: VitalsData): number {
 function painRisk(regions: BodyRegion[]): number {
   if (regions.length === 0) return 0;
   const maxPain = Math.max(...regions.map((r) => r.painLevel));
-  // Critical regions get extra weight
+  // Critical regions get extra weight. Self-reported pain is capped at 5 so a
+  // 10/10 rating alone cannot reach ESI 1-2 without abnormal vitals.
   const criticalIds = ["chest-left", "chest-right", "head-front", "abdomen"];
   const hasCriticalRegion = regions.some((r) => criticalIds.includes(r.id));
-  return maxPain + (hasCriticalRegion ? 2 : 0);
+  return Math.min(5, Math.round(maxPain / 2)) + (hasCriticalRegion ? 2 : 0);
 }
 
 export function computeESI(input: ScoringInput): { level: ESILevel; rationale: string } {

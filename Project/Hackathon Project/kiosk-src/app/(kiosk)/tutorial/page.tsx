@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import KioskShell from "@/components/KioskShell";
@@ -56,7 +56,7 @@ function TapVisual() {
 }
 
 function RateVisual() {
-  const faces = ["😊", "🙂", "😐", "😕", "😣", "😭"];
+  const faces = ["ðŸ˜Š", "ðŸ™‚", "ðŸ˜", "ðŸ˜•", "ðŸ˜£", "ðŸ˜­"];
   const [active, setActive] = useState(2);
   return (
     <div className="flex flex-col items-center gap-4">
@@ -88,7 +88,7 @@ function RemoveVisual() {
             : "bg-white/5 border-white/20 scale-100 opacity-50"
         }`}
       >
-        {on ? "🔴" : "⬜"}
+        {on ? "ðŸ”´" : "â¬œ"}
       </button>
       <p className="text-sky-400 text-sm">Tap to toggle</p>
     </div>
@@ -106,7 +106,7 @@ export default function TutorialPage() {
   }
 
   return (
-    <KioskShell step={5}>
+    <KioskShell step={4}>
       <div className="flex flex-col items-center justify-center h-full gap-8 px-8 py-6">
         <div className="text-center">
           <p className="text-sky-400 text-sm font-semibold uppercase tracking-widest mb-2">
@@ -139,7 +139,7 @@ export default function TutorialPage() {
           onClick={next}
           className="px-12 py-5 rounded-2xl bg-sky-500 hover:bg-sky-400 active:scale-95 transition-all text-white font-bold text-xl"
         >
-          {step < STEPS.length - 1 ? "Next →" : "Got it — Start →"}
+          {step < STEPS.length - 1 ? "Next â†’" : "Got it â€” Start â†’"}
         </button>
 
         <button

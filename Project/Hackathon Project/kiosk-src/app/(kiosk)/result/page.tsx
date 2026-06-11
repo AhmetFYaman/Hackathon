@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import KioskShell from "@/components/KioskShell";
@@ -37,9 +37,9 @@ export default function ResultPage() {
   const info = ESI_LABELS[esiLevel];
 
   return (
-    <KioskShell step={8}>
+    <KioskShell step={7}>
       <div className="flex flex-col items-center gap-5 px-5 py-6 min-h-full justify-center">
-        {/* ESI badge — compact for portrait */}
+        {/* ESI badge â€” compact for portrait */}
         <div
           className="w-28 h-28 rounded-3xl flex flex-col items-center justify-center border-2 shrink-0"
           style={{
@@ -118,7 +118,7 @@ export default function ResultPage() {
                 {jetsonResult.hl7Path && (
                   <div className="bg-green-500/10 border border-green-500/20 rounded-xl px-4 py-2 text-center">
                     <p className="text-xs text-green-400">HL7 Record</p>
-                    <p className="text-green-300 font-bold text-xs">Generated ✓</p>
+                    <p className="text-green-300 font-bold text-xs">Generated âœ“</p>
                   </div>
                 )}
               </div>
@@ -144,11 +144,11 @@ export default function ResultPage() {
             {jetsonResult.esiSources && (
               <div className="flex gap-2 justify-center text-xs text-slate-600">
                 <span>Rules: ESI {jetsonResult.esiSources.rules}</span>
-                <span>·</span>
+                <span>Â·</span>
                 <span>RF Model: ESI {jetsonResult.esiSources.rfModel}</span>
                 {jetsonResult.esiSources.llmAvailable && jetsonResult.esiSources.llm && (
                   <>
-                    <span>·</span>
+                    <span>Â·</span>
                     <span>LLM: ESI {jetsonResult.esiSources.llm}</span>
                   </>
                 )}
@@ -159,7 +159,7 @@ export default function ResultPage() {
 
         {/* Nurse review notice */}
         <div className="flex items-center gap-3 bg-amber-500/10 border border-amber-500/20 rounded-xl px-5 py-3 max-w-md">
-          <span className="text-amber-400 text-xl">⚕️</span>
+          <span className="text-amber-400 text-xl">âš•ï¸</span>
           <p className="text-sm text-amber-200">{t(language, "result_nurse")}</p>
         </div>
 

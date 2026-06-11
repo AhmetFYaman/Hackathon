@@ -23,6 +23,7 @@ export type IntakeData = {
   chiefComplaintNote: string;
   ageGroup: "under18" | "18-40" | "41-65" | "over65" | null;
   sex: "male" | "female" | "nonbinary" | "prefer-not" | null;
+  weightKg: number | null;
   conditions: string[];   // e.g. ["diabetes", "hypertension"]
   allergies: string[];    // e.g. ["penicillin", "latex"]
   cameraConsent: boolean;
@@ -62,6 +63,8 @@ type KioskState = {
   sessionId: string;
   language: LangCode;
   consentGiven: boolean;
+  firstName: string;
+  lastName: string;
   intake: IntakeData | null;
   vitals: VitalsData;
   selectedRegions: BodyRegion[];
@@ -73,6 +76,7 @@ type KioskState = {
 
   setLanguage: (lang: LangCode) => void;
   setConsent: (v: boolean) => void;
+  setName: (first: string, last: string) => void;
   setIntake: (data: IntakeData) => void;
   setVitals: (v: Partial<VitalsData>) => void;
   addRegion: (region: BodyRegion) => void;
@@ -98,6 +102,7 @@ const freshIntake = (): IntakeData => ({
   chiefComplaintNote: "",
   ageGroup: null,
   sex: null,
+  weightKg: null,
   conditions: [],
   allergies: [],
   cameraConsent: false,
@@ -118,6 +123,8 @@ export const useKioskStore = create<KioskState>((set) => ({
   sessionId: makeSessionId(),
   language: "en",
   consentGiven: false,
+  firstName: "",
+  lastName: "",
   intake: null,
   vitals: freshVitals(),
   selectedRegions: [],
@@ -129,6 +136,7 @@ export const useKioskStore = create<KioskState>((set) => ({
 
   setLanguage: (lang) => set({ language: lang }),
   setConsent: (v) => set({ consentGiven: v }),
+  setName: (first, last) => set({ firstName: first.trim(), lastName: last.trim() }),
   setIntake: (data) => set({ intake: data }),
   setVitals: (v) => set((s) => ({ vitals: { ...s.vitals, ...v } })),
   addRegion: (region) =>
@@ -155,6 +163,8 @@ export const useKioskStore = create<KioskState>((set) => ({
       sessionId: makeSessionId(),
       language: s.language, // preserve language between sessions
       consentGiven: false,
+      firstName: "",
+      lastName: "",
       intake: null,
       vitals: freshVitals(),
       selectedRegions: [],

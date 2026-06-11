@@ -90,7 +90,63 @@ export default function VitalsPage() {
   const { setVitals, vitals, intake, sessionId, language, setVideoRecordingTriggered } = useKioskStore();
   const [allDone, setAllDone] = useState(false);
   const [usingMock, setUsingMock] = useState(false);
+  const [clipStatus, setClipStatus] = useState<"idle" | "recording" | "done" | "off">("idle");
+  const [countdown, setCountdown] = useState(5);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const clipStartedRef = useRef(false);
+  const previewRef = useRef<HTMLVideoElement | null>(null);
+
+  // Records the 5-second clip with THIS device's camera (kiosk browser) and
+  // uploads it to the Jetson via the same-origin /api/clip proxy. Used when
+  // the kiosk display itself has a camera (e.g. laptop demo). If the browser
+  // blocks the camera, the Pi-camera path (triggered below) still covers it.
+  async function recordBrowserClip(sid: string) {
+    if (clipStartedRef.current) return;
+    clipStartedRef.current = true;
+    try {
+      if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined") {
+        setClipStatus("off");
+        return;
+      }
+      // 720p so the BP monitor digits are large enough for the OCR to decode
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { width: { ideal: 1280 }, height: { ideal: 720 } },
+        audio: false,
+      });
+      setClipStatus("recording");
+      // Live preview so the patient can aim the BP display at the camera
+      if (previewRef.current) {
+        previewRef.current.srcObject = stream;
+        previewRef.current.play().catch(() => {});
+      }
+      const cdTimer = setInterval(() => setCountdown((c) => Math.max(0, c - 1)), 1_000);
+
+      const mime = ["video/mp4", "video/webm;codecs=vp8", "video/webm"]
+        .find((m) => MediaRecorder.isTypeSupported(m));
+      const rec = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined);
+      const chunks: Blob[] = [];
+      rec.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+      const stopped = new Promise<void>((res) => { rec.onstop = () => res(); });
+      rec.start();
+      await new Promise((r) => setTimeout(r, 5_000));
+      rec.stop();
+      await stopped;
+      clearInterval(cdTimer);
+      stream.getTracks().forEach((t) => t.stop());
+      if (previewRef.current) previewRef.current.srcObject = null;
+
+      const type = rec.mimeType || "video/webm";
+      const ext = type.includes("mp4") ? "mp4" : "webm";
+      const fd = new FormData();
+      fd.append("file", new Blob(chunks, { type }), `clip.${ext}`);
+      fd.append("sessionId", sid);
+      const res = await fetch("/api/clip", { method: "POST", body: fd });
+      setClipStatus(res.ok ? "done" : "off");
+    } catch {
+      // No camera / permission denied — Pi camera path handles it instead
+      setClipStatus("off");
+    }
+  }
 
   function isHRAbnormal(hr: number) { return hr > 100 || hr < 60; }
   function isSpO2Abnormal(spo2: number) { return spo2 < 94; }
@@ -100,7 +156,9 @@ export default function VitalsPage() {
     setVitals({ status: "measuring" });
     fetch("/api/vitals", { method: "DELETE" }).catch(() => {});
 
-    // Trigger Pi to record a 5-second video clip if patient consented
+    // One-time 5-second clip, if the patient consented:
+    //  - trigger the Pi camera (sensor-station setups)
+    //  - AND try this device's own camera (laptop / webcam setups)
     if (intake?.cameraConsent) {
       fetch("/api/video", {
         method: "POST",
@@ -108,6 +166,9 @@ export default function VitalsPage() {
         body: JSON.stringify({ action: "start_recording", sessionId }),
       }).catch(() => {});
       setVideoRecordingTriggered(true);
+      recordBrowserClip(sessionId);
+    } else {
+      setClipStatus("off");
     }
 
     let noDataCount = 0;
@@ -167,7 +228,7 @@ export default function VitalsPage() {
   }
 
   return (
-    <KioskShell step={4}>
+    <KioskShell step={3}>
       <div className="flex flex-col h-full px-5 py-4 gap-4">
 
         {/* Header */}
@@ -177,25 +238,49 @@ export default function VitalsPage() {
           {usingMock && (
             <p className="text-amber-400 text-xs mt-1">{t(language, "vitals_mock_warn")}</p>
           )}
-          {intake?.cameraConsent && (
+          {intake?.cameraConsent && clipStatus === "recording" && (
             <p className="text-sky-400 text-xs mt-1">
-              📷 Recording — video will be analyzed for BP estimate
+              <span className="inline-block w-2 h-2 rounded-full bg-red-500 animate-pulse mr-1.5 align-middle" />
+              Recording 5s clip — hold your BP monitor display toward the camera
             </p>
+          )}
+          {intake?.cameraConsent && clipStatus === "done" && (
+            <p className="text-green-400 text-xs mt-1">Clip captured ✓</p>
           )}
         </div>
 
-        {/* Sensor animation — compact for portrait */}
-        <div className="flex justify-center shrink-0">
-          <div className="relative w-14 h-14">
-            <div className="absolute inset-0 rounded-full border-4 border-sky-500/30 animate-ping" />
-            <div className="absolute inset-1.5 rounded-full border-2 border-sky-500/50 animate-pulse" />
-            <div className="absolute inset-3 rounded-full bg-sky-500/20 flex items-center justify-center">
-              <svg className="w-5 h-5 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
-              </svg>
+        {/* Camera preview with aiming guide while the 5s clip records;
+            compact sensor animation otherwise */}
+        {clipStatus === "recording" ? (
+          <div className="relative mx-auto w-full max-w-md shrink-0 rounded-2xl overflow-hidden border-2 border-sky-500/60 shadow-lg shadow-sky-500/20">
+            <video ref={previewRef} autoPlay muted playsInline className="w-full max-h-[260px] object-cover bg-black" />
+            {/* Aiming guide box */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="w-[55%] h-[70%] border-4 border-dashed border-amber-400/90 rounded-xl flex items-start justify-center">
+                <span className="bg-black/70 text-amber-300 text-xs font-semibold px-2 py-1 rounded-b-lg">
+                  Hold BP display inside this box — close &amp; flat
+                </span>
+              </div>
+            </div>
+            {/* Countdown + REC badge */}
+            <div className="absolute top-2 left-2 flex items-center gap-2 bg-black/70 px-2.5 py-1 rounded-full">
+              <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+              <span className="text-white text-xs font-bold">REC {countdown}s</span>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="flex justify-center shrink-0">
+            <div className="relative w-14 h-14">
+              <div className="absolute inset-0 rounded-full border-4 border-sky-500/30 animate-ping" />
+              <div className="absolute inset-1.5 rounded-full border-2 border-sky-500/50 animate-pulse" />
+              <div className="absolute inset-3 rounded-full bg-sky-500/20 flex items-center justify-center">
+                <svg className="w-5 h-5 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Vitals grid — 2-column on portrait */}
         <div className="grid grid-cols-2 gap-3 flex-1 min-h-0">

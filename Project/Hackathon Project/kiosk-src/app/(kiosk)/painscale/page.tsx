@@ -1,16 +1,16 @@
-"use client";
+﻿"use client";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import KioskShell from "@/components/KioskShell";
 import { useKioskStore } from "@/store/kioskStore";
 
 const FACES = [
-  { emoji: "😊", label: "No Pain",      value: 0,  color: "#22c55e" },
-  { emoji: "🙂", label: "Very Mild",    value: 2,  color: "#86efac" },
-  { emoji: "😐", label: "Mild",         value: 4,  color: "#facc15" },
-  { emoji: "😕", label: "Moderate",     value: 6,  color: "#fb923c" },
-  { emoji: "😣", label: "Severe",       value: 8,  color: "#ef4444" },
-  { emoji: "😭", label: "Worst",        value: 10, color: "#7f1d1d" },
+  { emoji: "ðŸ˜Š", label: "No Pain",      value: 0,  color: "#22c55e" },
+  { emoji: "ðŸ™‚", label: "Very Mild",    value: 2,  color: "#86efac" },
+  { emoji: "ðŸ˜", label: "Mild",         value: 4,  color: "#facc15" },
+  { emoji: "ðŸ˜•", label: "Moderate",     value: 6,  color: "#fb923c" },
+  { emoji: "ðŸ˜£", label: "Severe",       value: 8,  color: "#ef4444" },
+  { emoji: "ðŸ˜­", label: "Worst",        value: 10, color: "#7f1d1d" },
 ];
 
 export default function PainScalePage() {
@@ -40,7 +40,7 @@ export default function PainScalePage() {
   const face = FACES.find((f) => f.value === selected);
 
   return (
-    <KioskShell step={7}>
+    <KioskShell step={6}>
       <div className="flex flex-col items-center justify-center h-full gap-6 px-8 py-4">
         {/* Region header */}
         <div className="text-center">
@@ -63,7 +63,7 @@ export default function PainScalePage() {
             border: `2px solid ${face ? face.color : "rgba(255,255,255,0.1)"}`,
           }}
         >
-          {face ? face.emoji : "❓"}
+          {face ? face.emoji : "â“"}
         </div>
 
         {/* Face scale row */}
@@ -130,7 +130,7 @@ export default function PainScalePage() {
           disabled={selected === null}
           className="px-14 py-5 rounded-2xl bg-sky-500 hover:bg-sky-400 active:scale-95 transition-all text-white font-bold text-xl disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          {currentIdx < regions.length - 1 ? "Next Area →" : "Submit →"}
+          {currentIdx < regions.length - 1 ? "Next Area â†’" : "Submit â†’"}
         </button>
       </div>
     </KioskShell>

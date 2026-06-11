@@ -9,19 +9,35 @@ import { t } from "@/lib/i18n";
 type AgeGroup = IntakeData["ageGroup"];
 type Sex = IntakeData["sex"];
 
+// Inline SVG icons — emoji fonts are unreliable on the Pi/secondary displays
+const COMPLAINT_ICONS: Record<string, React.ReactNode> = {
+  chest_pain: <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />,
+  breathing: <path strokeLinecap="round" strokeLinejoin="round" d="M3 8h9a2.5 2.5 0 1 0-2.4-3.2M3 12h14a2.5 2.5 0 1 1-2.4 3.2M3 16h7" />,
+  head: <path strokeLinecap="round" strokeLinejoin="round" d="M12 3a6 6 0 0 1 6 6c0 1.7-.7 3.2-1.8 4.3L17 21h-7l-.5-3H8a1 1 0 0 1-1-1v-2.5H5.5a.8.8 0 0 1-.6-1.3L6 11.5A6 6 0 0 1 12 3z" />,
+  abdomen: <path strokeLinecap="round" strokeLinejoin="round" d="M8 3v3a4 4 0 0 0 8 0V3M8 21v-2a4 4 0 0 1 8 0v2M12 10v4m-3-2h6" />,
+  injury: <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 9.5 5 7a2 2 0 1 1 2-2l2.5 2.5m5 9.5 2.5 2.5a2 2 0 1 0 2-2L16.5 15M9 9l6 6" />,
+  fever: <path strokeLinecap="round" strokeLinejoin="round" d="M12 4a2 2 0 0 1 2 2v7.5a4 4 0 1 1-4 0V6a2 2 0 0 1 2-2zm0 11v3" />,
+  allergy: <path strokeLinecap="round" strokeLinejoin="round" d="M9.5 4.5 4.5 9.5a3.5 3.5 0 0 0 5 5l5-5a3.5 3.5 0 0 0-5-5zM7 7l5 5m3 1 4 4m-2-6 2 6-6-2" />,
+  mental: <path strokeLinecap="round" strokeLinejoin="round" d="M12 4a6 6 0 0 1 6 6c0 3.3-2.7 6-6 6h-1l-3 3v-3.6A6 6 0 0 1 12 4zM9 10h.01M12 10h.01M15 10h.01" />,
+  nausea: <path strokeLinecap="round" strokeLinejoin="round" d="M12 3s5 6.1 5 10a5 5 0 0 1-10 0c0-3.9 5-10 5-10zM9.5 14.5a2.5 2.5 0 0 0 2.5 2.5" />,
+  dizziness: <path strokeLinecap="round" strokeLinejoin="round" d="M12 12m-2 0a2 2 0 1 0 4 0 2 2 0 1 0-4 0M12 4a8 8 0 0 1 8 8m-3.5 6.5A8 8 0 0 1 4 12m2-5.5L4.5 5M18 17l1.5 1.5" />,
+  back_pain: <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v18M9 6h6M9 10h6M9 14h6M9 18h6" />,
+  skin: <path strokeLinecap="round" strokeLinejoin="round" d="M5 12 12 5a4.95 4.95 0 0 1 7 7l-7 7a4.95 4.95 0 0 1-7-7zM10 10h.01m4 4h.01m-4 0h.01m4-4h.01" />,
+};
+
 const COMPLAINT_GRID = [
-  { id: "chest_pain",    emoji: "🫀", key: "complaint_chest"     as const },
-  { id: "breathing",     emoji: "😮‍💨", key: "complaint_breathing"  as const },
-  { id: "head",          emoji: "🧠", key: "complaint_head"       as const },
-  { id: "abdomen",       emoji: "🤢", key: "complaint_abdomen"    as const },
-  { id: "injury",        emoji: "🦴", key: "complaint_injury"     as const },
-  { id: "fever",         emoji: "🤒", key: "complaint_fever"      as const },
-  { id: "allergy",       emoji: "💊", key: "complaint_allergy"    as const },
-  { id: "mental",        emoji: "💭", key: "complaint_mental"     as const },
-  { id: "nausea",        emoji: "🤮", key: "complaint_nausea"     as const },
-  { id: "dizziness",     emoji: "💫", key: "complaint_dizziness"  as const },
-  { id: "back_pain",     emoji: "🔙", key: "complaint_back"       as const },
-  { id: "skin",          emoji: "🩹", key: "complaint_skin"       as const },
+  { id: "chest_pain",    key: "complaint_chest"     as const },
+  { id: "breathing",     key: "complaint_breathing"  as const },
+  { id: "head",          key: "complaint_head"       as const },
+  { id: "abdomen",       key: "complaint_abdomen"    as const },
+  { id: "injury",        key: "complaint_injury"     as const },
+  { id: "fever",         key: "complaint_fever"      as const },
+  { id: "allergy",       key: "complaint_allergy"    as const },
+  { id: "mental",        key: "complaint_mental"     as const },
+  { id: "nausea",        key: "complaint_nausea"     as const },
+  { id: "dizziness",     key: "complaint_dizziness"  as const },
+  { id: "back_pain",     key: "complaint_back"       as const },
+  { id: "skin",          key: "complaint_skin"       as const },
 ];
 
 const AGE_GROUPS: { value: AgeGroup; keyLabel: "age_under18" | "age_18_40" | "age_41_65" | "age_over65" }[] = [
@@ -73,6 +89,7 @@ export default function IntakePage() {
   const [complaints, setComplaints] = useState<string[]>(intake?.chiefComplaints ?? []);
   const [ageGroup, setAgeGroup] = useState<AgeGroup>(intake?.ageGroup ?? null);
   const [sex, setSex] = useState<Sex>(intake?.sex ?? null);
+  const [weight, setWeight] = useState<string>(intake?.weightKg ? String(intake.weightKg) : "");
   const [conditions, setConditions] = useState<string[]>(intake?.conditions ?? []);
   const [allergies, setAllergies] = useState<string[]>(intake?.allergies ?? []);
 
@@ -104,11 +121,13 @@ export default function IntakePage() {
   }
 
   function finish() {
+    const w = parseFloat(weight);
     setIntake({
       chiefComplaints: complaints,
       chiefComplaintNote: "",
       ageGroup,
       sex,
+      weightKg: Number.isFinite(w) && w > 0 ? w : null,
       conditions,
       allergies,
       cameraConsent,
@@ -119,7 +138,7 @@ export default function IntakePage() {
   const subIdx = SUB_STEPS.indexOf(subStep);
 
   return (
-    <KioskShell step={3}>
+    <KioskShell step={2}>
       {/* h-full flex-col: scrollable middle, sticky nav at bottom */}
       <div className="flex flex-col h-full px-5 py-4 gap-3">
 
@@ -150,7 +169,7 @@ export default function IntakePage() {
               </div>
               {/* Fixed-height grid cells — 3 rows × 4 cols fits without giant tiles */}
               <div className="grid grid-cols-4 gap-2">
-                {COMPLAINT_GRID.map(({ id, emoji, key }) => {
+                {COMPLAINT_GRID.map(({ id, key }) => {
                   const active = complaints.includes(id);
                   return (
                     <button
@@ -162,7 +181,12 @@ export default function IntakePage() {
                           : "bg-white/5 border-white/10 hover:bg-white/10"
                       }`}
                     >
-                      <span className="text-3xl leading-none">{emoji}</span>
+                      <svg
+                        className={`w-8 h-8 ${active ? "text-sky-300" : "text-slate-400"}`}
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6}
+                      >
+                        {COMPLAINT_ICONS[id]}
+                      </svg>
                       <span className={`text-xs font-medium text-center leading-tight px-1 ${active ? "text-sky-300" : "text-slate-300"}`}>
                         {t(language, key)}
                       </span>
@@ -218,6 +242,24 @@ export default function IntakePage() {
                       {t(language, keyLabel)}
                     </button>
                   ))}
+                </div>
+              </div>
+
+              {/* Weight (optional) */}
+              <div>
+                <p className="text-slate-400 text-sm mb-2">Weight (optional)</p>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="number"
+                    inputMode="decimal"
+                    min={1}
+                    max={400}
+                    value={weight}
+                    onChange={(e) => setWeight(e.target.value)}
+                    placeholder="e.g. 70"
+                    className="flex-1 px-4 py-4 rounded-2xl bg-white/5 border border-white/10 text-white text-lg placeholder:text-slate-500 focus:outline-none focus:border-sky-500/60"
+                  />
+                  <span className="text-slate-400 text-base">kg</span>
                 </div>
               </div>
             </div>
